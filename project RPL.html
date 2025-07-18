@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toko Kami Lengkap</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f0f2f5;
+      }
+      header {
+        background: #343a40;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .nav-menu a {
+        color: white;
+        text-decoration: none;
+        margin-left: 15px;
+      }
+      .pages {
+        padding: 20px;
+      }
+      .hidden {
+        display: none;
+      }
+      .container,
+      .about,
+      .cart,
+      .history {
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .products {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      }
+      .product {
+        background: white;
+        padding: 10px;
+        text-align: center;
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      }
+      .product img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+      }
+      .cart-item,
+      .history-item {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+        position: relative;
+        text-align: center;
+      }
+      .modal-content img {
+        max-width: 200px;
+      }
+      .close {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        cursor: pointer;
+        font-size: 20px;
+      }
+      #receiptText {
+        text-align: left;
+        white-space: pre-line;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 6px;
+        margin-top: 10px;
+      }
+      input,
+      select,
+      button {
+        padding: 10px;
+        margin-top: 10px;
+        width: 100%;
+      }
+      button {
+        cursor: pointer;
+        background: #007bff;
+        border: none;
+        color: white;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      #authModal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, #89f7fe, #66a6ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+      }
+      #authCard {
+        background: white;
+        padding: 30px;
+        width: 90%;
+        max-width: 420px;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+      #about p {
+        margin-bottom: 20px;
+      }
+      #about {
+        padding: 80px; /* jarak ke dalam */
+        margin-top: 50px; /* jarak atas */
+      }
+      #about > * {
+        margin-bottom: 12px;
+      }
+      #home p {
+        margin-bottom: 20px;
+      }
+      #home {
+        padding: 80px; /* jarak ke dalam */
+        margin-top: 50px; /* jarak atas */
+      }
+      #home > * {
+        margin-bottom: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div><strong>Toko Kami</strong></div>
+      <div class="nav-menu">
+        <a href="#" onclick="showPage('home')">Home</a>
+        <a href="#" onclick="showPage('shop')">Shop</a>
+        <a href="#" onclick="showPage('about')">Tentang</a>
+        <a href="#" onclick="showPage('cart')">Keranjang</a>
+        <a href="#" onclick="showPage('history')">Riwayat</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </div>
+    </header>
+
+    <div id="mainContent" class="pages">
+      <div id="home" class="page container">
+        <h2>Selamat datang di Toko Kami!</h2>
+        <p>Silakan mulai berbelanja dengan memilih menu Shop.</p>
+      </div>
+
+      <div id="shop" class="page container hidden">
+        <h2>Produk Kami</h2>
+        <div class="products" id="productList"></div>
+      </div>
+
+      <div
+        id="about"
+        class="page about hidden"
+        style="padding: 20px; max-width: 600px; margin: auto; line-height: 1.6"
+      >
+        <h2 style="text-align: center; color: #333; margin-bottom: 20px">
+          Tentang Kami
+        </h2>
+
+        <p style="margin-bottom: 16px">
+          Kami menyediakan <strong>produk elektronik berkualitas</strong> dengan
+          harga terbaik dan pelayanan terpercaya.
+        </p>
+
+        <p style="margin-bottom: 10px">
+          <strong>Instagram:</strong>
+          <a
+            href="https://instagram.com/tokokami"
+            target="_blank"
+            style="color: #007bff; text-decoration: none"
+            >@tokokami</a
+          >
+        </p>
+
+        <p style="margin-bottom: 10px">
+          <strong>Email:</strong>
+          <a
+            href="mailto:tokokami@gmail.com"
+            style="color: #007bff; text-decoration: none"
+            >tokokami@gmail.com</a
+          >
+        </p>
+
+        <p>
+          <strong>Kontak:</strong>
+          <a
+            href="https://wa.me/628121612378"
+            target="_blank"
+            style="color: #007bff; text-decoration: none"
+          >
+            0812-1612-378 (M. Jihan Maulana Zuhri)
+          </a>
+        </p>
+      </div>
+
+      <div id="cart" class="page cart hidden">
+        <h2>Keranjang Belanja</h2>
+        <div id="cartItems"></div>
+        <p><strong>Total:</strong> Rp <span id="cartTotal">0</span></p>
+        <label>Metode Pembayaran:</label>
+        <select id="paymentMethod">
+          <option value="bca">Bank BCA</option>
+          <option value="bsi">Bank BSI</option>
+          <option value="bri">Bank BRI</option>
+          <option value="gopay">GoPay</option>
+          <option value="dana">DANA</option>
+          <option value="qris">QRIS</option>
+        </select>
+        <button onclick="checkout()">Bayar Sekarang</button>
+      </div>
+
+      <div id="history" class="page history hidden">
+        <h2>Riwayat Transaksi</h2>
+        <div id="historyList"></div>
+      </div>
+    </div>
+
+    <div id="authModal">
+      <div id="authCard">
+        <h2>Login</h2>
+        <form id="loginForm">
+          <input id="loginUsername" placeholder="Username" required />
+          <input
+            id="loginPassword"
+            type="password"
+            placeholder="Password"
+            required
+          />
+          <button type="submit">Login</button>
+        </form>
+        <div style="text-align: center; margin-top: 10px">
+          Belum punya akun?
+          <a href="#" onclick="swapAuth('register')">Daftar</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="paymentModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Instruksi Pembayaran</h3>
+        <div id="paymentInfo"></div>
+        <div id="receiptText"></div>
+        <button onclick="window.print()">Cetak Bukti</button>
+      </div>
+    </div>
+
+    <script>
+      const products = [
+        {
+          name: "Laptop ASUS TUF F15",
+          price: 6000000,
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqapTnHIeB9LI1tLRy1H1PJYLXM7uC_xmHbg&s",
+        },
+        {
+          name: "Mouse Logitech G",
+          price: 150000,
+          image:
+            "https://resource.logitech.com/w_1200,h_630,c_limit,q_auto,f_auto,dpr_1.0/d_transparent.gif/content/dam/logitech/en/products/mice/m100/gallery/m100-black-gallery-1.png",
+        },
+        {
+          name: "Keyboard Mechanical REXUS RGB",
+          price: 350000,
+          image:
+            "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAQERASEg8SFhUWGBgXFxIVFxUWFxcYFRcXFhUWFxcZHSggGRolGxUVIT0hJykrLi4uGB8/ODMsNygtLisBCgoKDg0OGxAQGy0lHx8vLS0tLS0rNy0tNS0tLy4vNS0tLS0rLy0tLy0tLS4tLS4uLSsxLS0tLS0tLi0tLS0tLf/AABEIAOEA4QMBIgACEQEDEQH/xAAcAAEAAgMBAQEAAAAAAAAAAAAAAgMBBQYECAf/xABJEAABBAAEAQYICQsDBAMAAAABAAIDEQQSITETBSIyQVFhFiNScYGRk9EGFTNCQ1NVobEHFGJyc5Kys9LT4SRj8DQ1osElVIP/xAAYAQEBAQEBAAAAAAAAAAAAAAAAAgEDBP/EACgRAQEAAQMEAgEDBQAAAAAAAAABEQIhURIxQaFh8HFSseEDEyKB8f/aAAwDAQACEQMRAD8A/cUREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEReHFcotZPBB86XOR3NjALj/AOTR6UHuREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEWHuABJIAGpJ0AA3JK0HhxyT9p4T20fvQdAuHxHLEDuX4I+Kw5MNJHWYaTSSMdk/WyR7fpLb+HPJP2ng/bR+9fjvxpB4QfnPHi4H5xm42dmTLloOzXVd6D6DRaDw35J+08H7eL+pZHw15K+0sH7eP+pBvkWiHwz5L+0sH7eP+pZ8MeS/tLB+2i/qQbxFo/DHkz7Swnto/6k8MuS/tLCe2j96DeItH4ZcmfaOE9tH708MeTPtHCe2j96DeItH4ZcmfaOE9tH708MeTPtHCe2j96DeItF4ZcmfaOE9tH708MuS/tHCe2j96DeotF4Z8l/aOE9tH71jw05L+0cJ7aP3oN8i0PhryX9o4T2rPettgMdDiIxLDKyRhunscHNNEg0R2EEehB6EREBERAREQEREBEWCUHj5adWGxH7OT+Ar5YLWhrOZHZjjNnQ6xRk6bGyXHXvX1B8IX/wCmxH7OT+Ar5VGHjBYXB2rGmwQTZAOztK3RWm7q+T3Ag2GdertgaB3AvqqttVjAvbxHZmNOta6Aa76CwB3KnHsZdtBq9Lq9e2tN1fiywRgNvqz7dR5uU77E7rK6THPr7/xEyNExtjSAbyjokXsO7v3U8S9olADWV+jq3Y3uNfSjntbDQvPRGoaW5CA7fe8wCYYtEel3fNsNIo5muzWN6y7d/cm/Cbjn0nynKwFhaxgBGzddSb1sbjattFHGyNDWEMYOogb6UNdNLNnTt7ljk2SMNcadsCNGHxjQCLzDoWTosYCRoc+wSDYcAG9rqqxQGjfvTfhzqUrxwwcrN6NEWdzeWtBRAsdnesxSNMLuYy9KPX1aAVTtjr3qMMwMpcdXG82jao5boVQOrupYMgEwc0UbtujaoB1WAKJ0b963dFzwswUjSx/i2HQkFxAIoHbyjZBr9GlHk6VpcQWMI251AXuTmrTaq71ZyqAyUNLXAtyhjS1gI1aTnA0Ojj6wo8rnolzasZxTWCy+3XoOiT1Ijfj2hyfI0yUWsOmuagOuurm+jsUHvAlLQ1m57C2ur0d/evbykBw4nPa4B5Jc4NYM2WmDIQL0AAN9aqkF4ZrizsaXgMAprcwaNLzW5xvsrfqol1ce/wCPuzzYl4bIAMu/VRG3mAPq0pT5TcA5tBg26JDhud9PRXvVkMjTDVG+cG6N6LnAnN13zRr/AJU+TWB8cgDC5rbcNGaHJRLr3FZtlW3Lc3j2zE9gu42n0Advd/ylXistOIYBpsK/FUcngB5IFkGgDRF2eo+herlTDAOcS2j2aDQ7aN02pbtjuvyxhMpis5M1gAU7Md7IoZaFC7152nWvoT8jB/8AiMMP0pv5r18/YeJroLIGhAu2jcEjm9I7O12Gnbr+/fke05Lw/nl/mvU68eK13aLAWVDRERAREQEREBRcpKDkGq+EX/TYj9m/+Ar5XZADlLpnDmg1qRuRWnVoPWvqj4Q/9NP+zf8AwlfKvBkLWHOKI0GXYBzh/wClrZcXKGPjaRYfddQDh6ecSkEbXRuLnWeoHNZ1rQg0KGuq9M+AIYRnjJ7Q8Hs2b6fuXgDHtLWZhrtp/wA7VMdtds1Z23++V2CykPLiCKNA56ugcoyuFdlrPJ8bC6nPIA0PSIG9aNIJuu7dQxMBiygPBuj26kXW26liMKYgHCQHNv3a1qOrt8yYTf8ARhWtEgF0L1bziK01NGzudO4LLy3iGgBZsNGYB3ntxIGl1Z3Kw/CuawS8QWRt1gUDqOzv7llmFJZxeILGw6zZI0HWND6wmHOp40R8TmkAGqLA8WaGlOcSNTR1rQKfKHDthGVvN1c1rwQ6icvOcb1AFitHFVYXCcVrnmRoy2R1WRl0Gmrtdu4phMIZy4OlaK63aC9dCa30+9MOdi7FZC2PmsaRoXND8wHN5xs0TqTp2LLnMOHbbY8130XZiMt5i4uo6mqpU4XDmV+R0gGh1OgHZmNI3D+M4XEFAkCusC9QSNtN+9ai6dK2HIYnaNcc2jnZ8zgHHXeupuhHzinJ8Qe2QBheNBmyvJFgXQaaFW791UugLHNYJNDXZ87U1p1Wpysfh/k5i0O3APXdAeehaqU6Z8s8nNaXPaG59OjTuabN0GuHZuvMIRxHMDnADs0Olb969M+HdBT45qJ3I3Gxs6ab9XYVPC8nOecxmAJFkuoXdeez7lXfZWnE3XYeGMMIsW7dxaS4dWhB9Oy8kuGADjneR3nQ+hMVE+ME8QHWtqvzH0K6XCu4eYyCju2vNr5tfuKrNuFSYX4bC5oBIMwrSw19ZtwC68u2tL94/JD/ANsw/nl/mvX4NhsLcIcJGg10TqT6K/8Aa/efyRf9sw/nl/nPU/1PDXdNKkoNU1zaIiICIiAiIgKDlNRKDU/CEf6bEfs3/wAJXy7BHK7KA1tAGqOtZ3b2QNyvqb4QNJw2IoWeG+gOvmlfLceMkjoCPaxZyH5xds663RumyXNePjvzZQG9ut7LPKEEkZje4AGg4CwbDjQOhPWDvRUczs+fJ1VVtWcRK97MmShd7t3OW9d/mha3qm+zP5vJK3McoAp2hrfbQ7+hV1LMXN8WKq7serfsVjZXhoHD2AG46lCEPaXO4ZObvHf70Zbt2XPwk7hlLoaqt3e5G4WcNDc0FDvdf4LHGf8AUn94e5DI8/Qu9Y9yMX8nYCQAtL4cu/TANn9auxVjBTRlwa+A2bPOJ9RaK61AOf8AUO9f+EuT6h3r/wAIwjwU7XFwdDZ31dX4KQwM+YPzQXt0nV+Cxnk+od6/8LIfJ9Q/1/4QYw8L5JQHFuZpuwQG9Y3ce0doR8T5JAxxb0tCCBtW5Jqtd9liGOVrnO4Ljm6uzUrAilD8/BdtVerrRN03lLGh5dkdlokDQi+s72RWh+5XYsvicG82tBqQ471uDS88kExcH8F2nUpy4aeTKeA/Q322rmqcHTU+VWOyjbLvuCdj2bdeh1V+IfKYmtJ5moAPbpdesetRxcM8rQ382cK6w0C996Gp13KtkincwM/NnivnZdTrepqyq65w3DGFfKIQGuGWwSwmta0OW7OnXS/efyTCuTMP55P5r1+GYaGdrMn5s/q1y66d/UF+8/krhc3k3DhzS0+M0IIPyr60K56rlrsWKai0KSloiIgIiICIiAsFZWCgqmIok7da17jB2j717cYeY7zLj8LgYc3yEdZAegzyQexZVSS966EiDtH3ryTBplab5goegNpaHkrDROykwRaukB8WytJH93coYeGMvl8THpLWjGbZI+70+tZ1L/t6d9+3x/Lq7g7R96zcHaPvXLzQx8aZohjprYyKYzrMl9Xm+7sU8VDGJWNEUesbj0G75o+7f3lOpN0zl0t4fyh96Xh/KH3rmcVHGPzfxMduc4HmN8h9Xp/ygsYljGxA8Jl8Rg1Y3bMO7UJ1JsdPeH8oespeH8pvrXMYuNjYcQeEy2tJHNaO3Y1or2RMJdcTOiXdBtbX2LcpzXQXh/Kb60vD+U31rmOTGMc2G42c5ovmt9Z07t1jCMY4DxbOm8dFu2c76JlM1W+HUZsP5TfWl4fym+tcs1jM04ETObIAOY2+iNNtu7zqT2MEsjREzoMPRbuS7bTRadV4dReH8pvrS8P5TfWuWexnFiHCZzo5Cea3cFtaVv3+9Jo47guJmshGrG6jI46itQt2bmupuDym+tZzYfym+tcu3Cx/Vx/uN9yjj8LE2GV3CZYY42GgHQHY9SbNdWHYfymetezDOYRbCCO0ari44GOcLhjojyGVt2Ut/wDBJ3+nb6P4Wps1vApKIUlgIiICIiAiIgKLlJQcg8eOOi5NmBYQ0ZpaDW/TTeSP011OO29f4LmG4R9NAxM3RbqBB5I/2lOp0/p2ztcPLjuSoozCG8QZn04Caajdk/P6yoY7kuJkDpG8QOzDUSza7DXnamgPUvZiuTXZS44qclvObfBoEdwjVGDwDp4m58TNTmNcQOEBZaHaDh9qiycPRp16u/X+e7MvJMQjmcBIC0aESzXpt8/XcpguSonNDjxCeGDfFmuy0E/O7epY5Pwz5mjNiZqcXggcICg9zfI7AEwcDyXt48tNfwxXDHNDWEXzNd1mJwjVdW86u35/CPJWAjkbGX53E5tTJJejnN052mmmijg8CxxcHZzUhaLkk2GUj53arI8I5kj42zygMy1XDvn5ybOTtClJhCyXI2eQAtMh+TvNbRvk21TE4ctW/lScCziTsOctaWgAySEU4Gx0tfSpT4NjZstyZeHmriSVdgX0lPFYQsfHU0ly3mPiyea0kVzVnFYRzQx/HkzOc1lnhnmkj9FMThw1ScIS4GNroQ0vAc12gkkrmjT52noWJcFGGxFpeM0mU1JJqDZPzvvVmKwzhGZONJmYDROQ76HTKrJMGS1xM0nMtw6G4Br5qqRxunT+n9vvh5cTg42xPe0vDg5tkSP6yBrZ7FKfk+LLMQXhzWE2JJL0ur52vXurYMG6VoDp5KcGuIHDAvQ+T2qGGgdK3nTyc/MDXDGlkeT3LpK3p0+NP7ffJheS43ZSeJeXfiS3qAT87tpUYDAxvbCXGQk62ZJLs2NKdpoVfh4X28ceQBriwUIxoO3mquPAva98bcTK1sYZloRXzhZslirN5VNOn9KvD4Brs+Z8pqR7R42UUGmgNHa+lSxvJkQgmcHS9B30spG3YXUro+TXgEDEy6kuJqLc6n5irx+BkbDKTipXDI7mkRVt3MCqW57rk+GYOTYyW2Zdr+VmrQD9KuvZdF8EdIGjuH8IWhgwryR/qJOjdeK7P1NlvPgn8gzzD8AstuN7lboWqarYrAoBERAREQEREBQcpqD0Hgx23r/Bc22OcsjIliByMJ8U87sB+tXSY3b1/gudhfPkjqOK8jN5Hj5ja+jKyr0S+FRw+McCDiIaO/iHf3l544sVCY4hNCRkIvguumAAacVeg4zFB5ZwYLAB+VfWpIH0fcqMbJihU7ooaYHChK+zmrtj7lGztOu8ehsGIgEQbNFz3uAuJ1jMXPP0mupKxLBiIWOkEsRzSAkGJw1dlZY8ZtoFfO3FSGPxUIyOseMfroRR8XpuqpXYqdr4xFAAyRoJMr9S3K/Txe2tLMF1XvcfPblmeDEME03FiJAFgxOAOTNVeM06RU24ad5EhljsM+rNUcrq+U30CziGY18ckfCwwDwRfGkJF93CWIvz9org4Wqy3xpdgK+pW4jjbarw0U84heZIwdS0CM0LBab5+qxE2edoBkjpshqmHeN255/b1KzAR4yJrGiPDnKKviya+jhKOGhxsYIbFhjbnO1mkHTN18kswixgxzP40RkjoENNMdrYu+nopu4+eSLPH0ASQx2ocaqs+irZFjmukcIsMc7g4jjSCqaBXyOuykYsbxHScLDW5rW5eNJQykm74XePUtw53Sk1s8bo4w+PVho5DdMHZn1VfAmi4QD4jmdlBMZsXbr6eqy2eeSTMY4wYszCA9xBzgGwcinNJO57GmOMGIh/TdrYIA6Heqjn/jL59qcTHNExzw+N2Z4sGM7vIbfTVv5riQ57uLES6r8U6uaKH0ijjHzvDYTHGLp4Od2zHA10O5TkxmJaWAwxc80PGO3AvXmLrJVzHz7VYo4qJocXwkW0UI3jpGr6ZTHx4jhTZpIiA03Ubh3b5yscpTYh0bbiirOz6R3lfs1nHS4gxz3DEAWnMRI4kebmKtMvx6WshZiOp8VV9W7av11ufgr8izzD8AtPFLODpDH0aviO2r9Rbn4MDxLPMPwCi5xupv2KwKtisCkEREBERAREQFBymolB4MdoL8/4LloeUsobcElhrRo/D1zQB9btouymiDhRXidyc3sRsrk5eVQJXScGSnNaKz4fdpd/u94UOUOWWyxPj4LwT2vw/wDdXWHk1vYsfFrexZhvV5w5lnwlaD8hJ7TDf3V54OXAwyngv5784p+H8ljfrf0V13xa3sT4tb2JhmXLeEg/+vJ7TDf3U8JG/USe0w391dT8WtT4tamGOW8I2/USfv4f+6nhG36iT9/D/wB1dT8WtT4tamByvhI36mT9/D/3UHwjZ9U/9/D/AN1dV8WtWPixqDjoOWGMdK7huOd2YU+DSmga+M7irDy23iPk4buc1razwWMpJP0nmXW/FjU+LGdiYZhyUvLTHSsk4T+axzaz4e+cR/udyT8tNeYTwnjI4uPPg15pGnjF1nxWzsT4qZ2LTDksVyw2RgaIn9NrrL4Oo2fpFLFcsNfHM0Rvt4IFuhoX/wDour+KmeSPUsfFMfkj1Lctc1FyywacKTaulD2V5a6D4MN8SzuAHpAAK9DeSY/JHqC92GgDBQCwXtViiApICIiAiIgIiICwsogiQolqsRBVkTKrKSkFeVMqspKQV5UyqykpBXlTKrKSkFeRMispKQV5EyKykpBXkTIrKSkFeRMqspKQQDVIBZWUGFlEQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERB//2Q==",
+        },
+        {
+          name: "Handphone Samsung Galaxy S24 Ultra 5G",
+          price: 17000000,
+          image:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKPaPLU4eO7qv3KRupGzFEr5UiWlFds4-YFg&s",
+        },
+        {
+          name: "Headset Rexus F22 RGB",
+          price: 110000,
+          image:
+            "data:image/jpeg;base64,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",
+        },
+      ];
+
+      const paymentData = {
+        bca: "Transfer ke BCA 2304070353 M.Jihan Maulana Zuhri TOKO KAMI",
+        bsi: "Transfer ke BSI 2304070359 M.Jihan Maulana Zuhri TOKO KAMI",
+        bri: "Transfer ke BRI 2304070309 M.Jihan Maulana Zuhri TOKO KAMI",
+        gopay: "Kirim ke GoPay 0812163354313 M.Jihan Maulana Zuhri TOKO KAMI",
+        dana: "Kirim ke DANA 0812163354313 M.Jihan Maulana Zuhri TOKO KAMI",
+        qris: "Scan QR ini:<br><img src='https://barcode.tec-it.com/barcode.ashx?data=010123456789012890TEC-IT%5CF8200https%3A%2F%2Fwww.tec-it.com&code=GS1QRCode&translate-esc=on&eclevel=L'>",
+      };
+
+      const pages = {
+        home: document.getElementById("home"),
+        shop: document.getElementById("shop"),
+        about: document.getElementById("about"),
+        cart: document.getElementById("cart"),
+        history: document.getElementById("history"),
+      };
+
+      function showPage(name) {
+        for (let p in pages) pages[p].classList.add("hidden");
+        pages[name].classList.remove("hidden");
+        if (name === "cart") renderCart();
+        if (name === "history") renderHistory();
+      }
+
+      function renderProducts() {
+        const list = document.getElementById("productList");
+        list.innerHTML = "";
+        products.forEach((p) => {
+          const div = document.createElement("div");
+          div.className = "product";
+          div.innerHTML = `
+      <img src="${p.image}" alt="${p.name}" />
+      <h4>${p.name}</h4>
+      <p>Rp ${p.price.toLocaleString("id-ID")}</p>
+      <button onclick='addToCart(${JSON.stringify(p)})'>Tambah</button>
+    `;
+          list.appendChild(div);
+        });
+      }
+
+      function addToCart(product) {
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+        cart.push(product);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        alert("Ditambahkan ke keranjang!");
+      }
+
+      function renderCart() {
+        const items = JSON.parse(localStorage.getItem("cart") || "[]");
+        const container = document.getElementById("cartItems");
+        const total = document.getElementById("cartTotal");
+        container.innerHTML = "";
+        let sum = 0;
+        items.forEach((item, index) => {
+          const div = document.createElement("div");
+          div.className = "cart-item";
+          div.innerHTML = `<span>${item.name} - Rp ${item.price.toLocaleString(
+            "id-ID"
+          )}</span><button onclick="removeFromCart(${index})">Hapus</button>`;
+          container.appendChild(div);
+          sum += item.price;
+        });
+        total.textContent = sum.toLocaleString("id-ID");
+      }
+
+      function removeFromCart(index) {
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+        cart.splice(index, 1);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        renderCart();
+      }
+
+      function checkout() {
+        const items = JSON.parse(localStorage.getItem("cart") || "[]");
+        if (!items.length) return alert("Keranjang kosong");
+        const method = document.getElementById("paymentMethod").value;
+        const total = items.reduce((a, b) => a + b.price, 0);
+        const date = new Date().toLocaleString("id-ID");
+        const receipt =
+          `TOKO KAMI\n------------------------\nTanggal: ${date}\nMetode: ${method.toUpperCase()}\nTotal : Rp ${total.toLocaleString(
+            "id-ID"
+          )}\nProduk:` +
+          items.map((i) => `\n- ${i.name}`).join("") +
+          `\n------------------------\nTerima kasih!`;
+        document.getElementById("paymentInfo").innerHTML = paymentData[method];
+        document.getElementById("receiptText").innerText = receipt;
+        document.getElementById("paymentModal").style.display = "flex";
+        const history = JSON.parse(localStorage.getItem("history") || "[]");
+        history.push({ date, method, total, items });
+        localStorage.setItem("history", JSON.stringify(history));
+        localStorage.removeItem("cart");
+        renderCart();
+      }
+
+      function renderHistory() {
+        const history = JSON.parse(localStorage.getItem("history") || "[]");
+        const list = document.getElementById("historyList");
+        list.innerHTML = history
+          .map(
+            (h) =>
+              `<div class='history-item'><div><strong>${
+                h.date
+              }</strong><br>${h.items
+                .map((i) => i.name)
+                .join(", ")}</div><div>Rp ${h.total.toLocaleString(
+                "id-ID"
+              )}<br><em>${h.method.toUpperCase()}</em></div></div>`
+          )
+          .join("");
+      }
+
+      function closeModal() {
+        document.getElementById("paymentModal").style.display = "none";
+      }
+
+      function logout() {
+        localStorage.removeItem("loggedIn");
+        document.getElementById("authModal").style.display = "flex";
+        document.getElementById("mainContent").style.display = "none";
+      }
+
+      function swapAuth(mode) {
+        const card = document.getElementById("authCard");
+        card.innerHTML =
+          mode === "register"
+            ? `
+        <h2>Daftar</h2>
+        <form id="registerForm">
+          <input id="registerUsername" placeholder="Username" required />
+          <input id="registerPassword" type="password" placeholder="Password" required />
+          <button type="submit">Daftar</button>
+        </form>
+        <div style="text-align:center; margin-top:10px;">
+          Sudah punya akun? <a href='#' onclick="swapAuth('login')">Login</a>
+        </div>`
+            : location.reload();
+
+        if (mode === "register") {
+          document.getElementById("registerForm").onsubmit = (e) => {
+            e.preventDefault();
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                u: document.getElementById("registerUsername").value,
+                p: document.getElementById("registerPassword").value,
+              })
+            );
+            alert("Registrasi berhasil!");
+            location.reload();
+          };
+        }
+      }
+
+      document.getElementById("loginForm").onsubmit = (e) => {
+        e.preventDefault();
+        const u = document.getElementById("loginUsername").value;
+        const p = document.getElementById("loginPassword").value;
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (user && user.u === u && user.p === p) {
+          localStorage.setItem("loggedIn", "1");
+          document.getElementById("authModal").style.display = "none";
+          document.getElementById("mainContent").style.display = "block";
+          showPage("home");
+        } else {
+          alert("Login gagal!");
+        }
+      };
+
+      window.onload = () => {
+        renderProducts();
+        if (!localStorage.getItem("loggedIn")) {
+          document.getElementById("authModal").style.display = "flex";
+          document.getElementById("mainContent").style.display = "none";
+        } else {
+          document.getElementById("authModal").style.display = "none";
+          document.getElementById("mainContent").style.display = "block";
+          showPage("home");
+        }
+      };
+    </script>
+  </body>
+</html>
